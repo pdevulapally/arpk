@@ -2,7 +2,7 @@
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import Link from 'next/link';
-import { auth, db } from '@/src/lib/firebase';
+import { auth, db } from '@/lib/firebase';
 import { useState } from 'react';
 
 export default function SignupPage() {

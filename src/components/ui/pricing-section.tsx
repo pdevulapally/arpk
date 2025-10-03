@@ -2,7 +2,7 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { Briefcase, CheckCheck, Database, Server, XCircle } from "lucide-react";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 
 const plans = [
   {
@@ -68,7 +68,6 @@ const plans = [
 // Removed yearly toggle for simplicity – pricing is presented as starting points
 
 export default function PricingSection() {
-  const [isYearly] = useState(false);
   const pricingRef = useRef<HTMLDivElement>(null);
   const formatNumber = (n: number) => new Intl.NumberFormat().format(n);
 
@@ -82,7 +81,7 @@ export default function PricingSection() {
     hidden: { filter: "blur(10px)", y: -20, opacity: 0 },
   };
 
-  const togglePricingPeriod = (value: string) => setIsYearly(Number.parseInt(value) === 1);
+  // Yearly toggle removed; pricing is static
 
   return (
     <div className="px-4 py-16 sm:py-20 min-h-screen mx-auto relative" ref={pricingRef}>
