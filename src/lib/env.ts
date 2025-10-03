@@ -1,0 +1,40 @@
+import { z } from 'zod';
+
+const client = z.object({
+  NEXT_PUBLIC_FIREBASE_API_KEY: z.string().min(1),
+  NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: z.string().min(1),
+  NEXT_PUBLIC_FIREBASE_PROJECT_ID: z.string().min(1),
+  NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: z.string().min(1),
+  NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: z.string().min(1),
+  NEXT_PUBLIC_FIREBASE_APP_ID: z.string().min(1),
+});
+
+const server = z.object({
+  STRIPE_SECRET_KEY: z.string().default(''),
+  STRIPE_WEBHOOK_SECRET: z.string().default(''),
+  STRIPE_PRICE_SIMPLE: z.string().optional(),
+  STRIPE_PRICE_BUSINESS: z.string().optional(),
+  STRIPE_PRICE_COMPLEX: z.string().optional(),
+  STRIPE_CONNECTED_ACCOUNT_ID: z.string().default(''),
+});
+
+export const env = {
+  client: client.parse({
+    NEXT_PUBLIC_FIREBASE_API_KEY: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+    NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+    NEXT_PUBLIC_FIREBASE_PROJECT_ID: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+    NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+    NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+    NEXT_PUBLIC_FIREBASE_APP_ID: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  }),
+  server: server.parse({
+    STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
+    STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
+    STRIPE_PRICE_SIMPLE: process.env.STRIPE_PRICE_SIMPLE,
+    STRIPE_PRICE_BUSINESS: process.env.STRIPE_PRICE_BUSINESS,
+    STRIPE_PRICE_COMPLEX: process.env.STRIPE_PRICE_COMPLEX,
+    STRIPE_CONNECTED_ACCOUNT_ID: process.env.STRIPE_CONNECTED_ACCOUNT_ID,
+  }),
+};
+
+

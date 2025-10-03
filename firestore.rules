@@ -1,0 +1,34 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() { return request.auth != null; }
+    function isAdmin() { return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'; }
+    function isClient() { return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'client'; }
+
+    // Public creates
+    match /contactSubmissions/{id} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+    match /requests/{id} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Admin full access
+    match /{document=**} {
+      allow read, write: if isAdmin();
+    }
+
+    // Clients can read their own projects and invoices
+    match /projects/{id} {
+      allow read: if isClient() && resource.data.clientId == request.auth.uid;
+    }
+    match /invoices/{id} {
+      allow read: if isClient() && resource.data.projectId in [
+        // In production, consider checking ownership by joining via project
+      ];
+    }
+  }
+}
+

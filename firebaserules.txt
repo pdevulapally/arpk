@@ -1,0 +1,151 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function userDoc(uid) {
+      return get(/databases/$(database)/documents/users/$(uid)).data;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && userDoc(request.auth.uid).role == 'admin';
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Optional validators (kept from your rules; adjust as your data model evolves)
+    function isValidMessage() {
+      let m = request.resource.data;
+      return m.senderId == request.auth.uid &&
+             m.text is string &&
+             m.timestamp is timestamp &&
+             (isAdmin() || m.receiverId != null);
+    }
+
+    function isValidChat() {
+      return request.resource.data.participants.hasAny([request.auth.uid]) &&
+             request.resource.data.participants.size() >= 2;
+    }
+
+    // USERS
+    match /users/{userId} {
+      allow read: if isSignedIn() && (isOwner(userId) || isAdmin());
+      allow write: if isOwner(userId) || isAdmin();
+
+      // Per-user messages (optional section retained)
+      match /messages/{messageId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow create: if isSignedIn() && isValidMessage();
+        allow update, delete: if isAdmin();
+      }
+    }
+
+    // CONTACT SUBMISSIONS (your app uses `contactSubmissions` collection)
+    match /contactSubmissions/{id} {
+      allow create: if true;                          // public can submit
+      allow read, update, delete: if isAdmin();       // only admins can view/manage
+    }
+
+    // REQUESTS
+    match /requests/{requestId} {
+      allow create: if isSignedIn();
+      allow read: if isAdmin() || (isSignedIn() && (
+        resource.data.userId == request.auth.uid ||
+        (resource.data.clientEmail != null && request.auth.token.email == resource.data.clientEmail)
+      ));
+      allow update: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow delete: if isAdmin();
+
+      // Request comments (optional; retained from your rules)
+      match /comments/{commentId} {
+        allow read: if isAdmin() || isOwner(get(/databases/$(database)/documents/requests/$(requestId)).data.userId);
+        allow create, update, delete: if isAdmin();
+      }
+    }
+
+    // PROJECTS
+    match /projects/{projectId} {
+      // Admin: full access
+      allow read, write: if isAdmin();
+      // Clients can read their own projects (support either clientId or userId fields)
+      allow read: if isSignedIn() && (
+        resource.data.clientId == request.auth.uid ||
+        resource.data.userId == request.auth.uid
+      );
+    }
+
+    // INVOICES
+    match /invoices/{invoiceId} {
+      // Admin: full access
+      allow read, write: if isAdmin();
+      // Clients can read invoices addressed to them
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      // No deletes by clients
+      allow delete: if false;
+
+      // Payments under an invoice (optional; retained)
+      match /payments/{paymentId} {
+        allow read: if isAdmin() || (request.auth != null && resource.data.customerEmail == request.auth.token.email);
+        allow write: if isAdmin();
+      }
+    }
+
+    // SERVICES (optional; retained)
+    match /services/{serviceId} {
+      allow read: if isSignedIn() || isAdmin();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // SUPPORT (optional; retained)
+    match /support/{ticketId} {
+      allow read: if isAdmin() || isOwner(resource.data.userId);
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update: if isAdmin() || isOwner(resource.data.userId);
+      allow delete: if isAdmin();
+
+      match /messages/{messageId} {
+        allow read: if isAdmin() || isOwner(get(/databases/$(database)/documents/support/$(ticketId)).data.userId);
+        allow create: if isSignedIn() && (isAdmin() || isOwner(get(/databases/$(database)/documents/support/$(ticketId)).data.userId)) && isValidMessage();
+        allow update, delete: if isAdmin();
+      }
+    }
+
+    // CHATS (optional; retained)
+    match /chats/{chatId} {
+      allow read: if isSignedIn() || isAdmin();
+      allow create: if isSignedIn() && (isAdmin() || isValidChat());
+      allow update: if isSignedIn() && (resource.data.participants.hasAny([request.auth.uid]) || isAdmin());
+      allow delete: if isAdmin();
+
+      match /messages/{messageId} {
+        allow read: if isSignedIn() || isAdmin();
+        allow create: if isSignedIn() && (isAdmin() || get(/databases/$(database)/documents/chats/$(chatId)).data.participants.hasAny([request.auth.uid]));
+        allow update, delete: if isAdmin();
+      }
+    }
+
+    // DISCOUNT CODES (optional; secured - removed temporary open write)
+    match /discountCodes/{discountId} {
+      allow read: if isSignedIn() || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // PAYMENTS (top-level) (optional; retained, admin-only)
+    match /payments/{paymentId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Default deny for any other paths
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+
+
