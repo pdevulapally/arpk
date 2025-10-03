@@ -9,6 +9,7 @@ export function Header() {
   const [open, setOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [user, setUser] = useState<{ uid: string; displayName: string | null; email: string | null; photoURL: string | null } | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
 
@@ -27,11 +28,13 @@ export function Header() {
             const data = snap.data() as any;
             profileName = data?.name || data?.displayName || profileName;
             profilePhoto = data?.photoURL || data?.avatarUrl || profilePhoto;
+            setUserRole(data?.role || 'user');
           }
         } catch {}
         setUser({ uid: u.uid, displayName: profileName, email: u.email, photoURL: profilePhoto });
       } else {
         setUser(null);
+        setUserRole(null);
       }
     });
     const onDocClick = (e: MouseEvent) => {
@@ -141,12 +144,34 @@ export function Header() {
                   <div className="px-4 py-3">
                     <p className="text-sm font-medium text-foreground">{user.displayName || 'Account'}</p>
                     <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                    {userRole && (
+                      <span className={`mt-2 inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] capitalize ${userRole==='admin' ? 'bg-purple-500/15 text-purple-600 border-purple-500/30' : 'bg-blue-500/15 text-blue-600 border-blue-500/30'}`}>
+                        {userRole}
+                      </span>
+                    )}
                   </div>
                   <div className="h-px bg-border" />
                   <div className="py-1">
-                    <Link href="/dashboard" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>Client dashboard</Link>
-                    <Link href="/admin" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>Admin dashboard</Link>
-                    <Link href="/request" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>Make a request</Link>
+                    {userRole === 'admin' ? (
+                      // Admin dropdown
+                      <>
+                        <Link href="/admin" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>Admin dashboard</Link>
+                        <Link href="/admin/requests" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>Requests</Link>
+                        <Link href="/admin/projects" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>Projects</Link>
+                        <Link href="/admin/invoices" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>Invoices</Link>
+                        <Link href="/admin/users" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>Users</Link>
+                        <Link href="/admin/settings" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>Settings</Link>
+                      </>
+                    ) : (
+                      // Client/User dropdown
+                      <>
+                        <Link href="/dashboard" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>Client dashboard</Link>
+                        <Link href="/dashboard/requests" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>My requests</Link>
+                        <Link href="/dashboard/projects" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>My projects</Link>
+                        <Link href="/dashboard/invoices" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>My invoices</Link>
+                        <Link href="/request" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>Make a request</Link>
+                      </>
+                    )}
                   </div>
                   <div className="h-px bg-border" />
                   <button onClick={handleSignOut} className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-accent">Sign out</button>
@@ -171,6 +196,56 @@ export function Header() {
               </svg>
             )}
           </button>
+          {user && (
+            <div className="relative" ref={menuRef}>
+              <button onClick={() => setMenuOpen(v => !v)} className="flex items-center gap-2 rounded-full border border-border bg-card px-2 py-1 hover:bg-accent">
+                {user.photoURL ? (
+                  <img src={user.photoURL} alt="Profile" className="h-8 w-8 rounded-full object-cover" />
+                ) : (
+                  <div className={`h-8 w-8 rounded-full grid place-items-center text-sm font-medium text-foreground bg-gradient-to-br ${gradientFor(user.displayName || user.email || 'U')}`}>
+                    {avatarText(user.displayName || user.email)}
+                  </div>
+                )}
+                <svg className="h-4 w-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7"/></svg>
+              </button>
+              {menuOpen && (
+                <div className="absolute right-0 mt-2 w-56 rounded-lg border border-border bg-card shadow-lg overflow-hidden">
+                  <div className="px-4 py-3">
+                    <p className="text-sm font-medium text-foreground">{user.displayName || 'Account'}</p>
+                    <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                    {userRole && (
+                      <span className={`mt-2 inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] capitalize ${userRole==='admin' ? 'bg-purple-500/15 text-purple-600 border-purple-500/30' : 'bg-blue-500/15 text-blue-600 border-blue-500/30'}`}>
+                        {userRole}
+                      </span>
+                    )}
+                  </div>
+                  <div className="h-px bg-border" />
+                  <div className="py-1">
+                    {userRole === 'admin' ? (
+                      <>
+                        <Link href="/admin" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>Admin dashboard</Link>
+                        <Link href="/admin/requests" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>Requests</Link>
+                        <Link href="/admin/projects" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>Projects</Link>
+                        <Link href="/admin/invoices" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>Invoices</Link>
+                        <Link href="/admin/users" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>Users</Link>
+                        <Link href="/admin/settings" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>Settings</Link>
+                      </>
+                    ) : (
+                      <>
+                        <Link href="/dashboard" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>Client dashboard</Link>
+                        <Link href="/dashboard/requests" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>My requests</Link>
+                        <Link href="/dashboard/projects" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>My projects</Link>
+                        <Link href="/dashboard/invoices" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>My invoices</Link>
+                        <Link href="/request" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>Make a request</Link>
+                      </>
+                    )}
+                  </div>
+                  <div className="h-px bg-border" />
+                  <button onClick={() => { setMenuOpen(false); handleSignOut(); }} className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-accent">Sign out</button>
+                </div>
+              )}
+            </div>
+          )}
           <button className="p-2" onClick={() => setOpen(v => !v)} aria-label="Open menu">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -189,28 +264,7 @@ export function Header() {
               <Link href="/request" className="block rounded-2xl px-6 py-3 bg-primary text-primary-foreground font-medium text-center" onClick={() => setOpen(false)}>Get Started</Link>
               <Link href="/login" className="block rounded-2xl px-6 py-3 border border-border text-center" onClick={() => setOpen(false)}>Login</Link>
             </>
-          ) : (
-            <div className="space-y-2">
-              <div className="flex items-center gap-3">
-                {user.photoURL ? (
-                  <img src={user.photoURL} alt="Profile" className="h-9 w-9 rounded-full object-cover" />
-                ) : (
-                  <div className={`h-9 w-9 rounded-full grid place-items-center text-sm font-medium text-foreground bg-gradient-to-br ${gradientFor(user.displayName || user.email || 'U')}`}>
-                    {avatarText(user.displayName || user.email)}
-                  </div>
-                )}
-                <div>
-                  <div className="text-sm font-medium text-foreground">{user.displayName || 'Account'}</div>
-                  <div className="text-xs text-muted-foreground truncate max-w-[180px]">{user.email}</div>
-                </div>
-              </div>
-              <div className="h-px bg-border" />
-              <Link href="/dashboard" className="block px-2 py-2 rounded-md hover:bg-accent" onClick={() => setOpen(false)}>Client dashboard</Link>
-              <Link href="/admin" className="block px-2 py-2 rounded-md hover:bg-accent" onClick={() => setOpen(false)}>Admin dashboard</Link>
-              <Link href="/request" className="block px-2 py-2 rounded-md hover:bg-accent" onClick={() => setOpen(false)}>Make a request</Link>
-              <button onClick={() => { setOpen(false); handleSignOut(); }} className="w-full text-left px-2 py-2 rounded-md hover:bg-accent text-red-600">Sign out</button>
-            </div>
-          )}
+          ) : null}
         </div>
       )}
     </header>

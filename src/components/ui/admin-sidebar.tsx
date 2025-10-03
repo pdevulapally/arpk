@@ -29,6 +29,7 @@ import {
   SidebarRail,
   SidebarTrigger,
   SidebarOverlay,
+  useSidebar,
 } from "./sidebar";
 import { useUserRole } from "@/hooks/useUserRole";
 import { signOut } from "firebase/auth";
@@ -83,6 +84,7 @@ const clientMenuItems = [
 export function AdminSidebar() {
   const pathname = usePathname();
   const { role } = useUserRole();
+  const { setOpen } = useSidebar();
 
   const handleSignOut = async () => {
     try {

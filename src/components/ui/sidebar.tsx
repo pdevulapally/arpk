@@ -26,16 +26,35 @@ const SidebarProvider = React.forwardRef<
     defaultOpen?: boolean;
     open?: boolean;
     onOpenChange?: (open: boolean) => void;
+    storageKey?: string;
   }
->(({ defaultOpen = true, open: openProp, onOpenChange, className, ...props }, ref) => {
+>(({ defaultOpen = true, open: openProp, onOpenChange, storageKey = "sidebar:open", className, ...props }, ref) => {
   const [open, setOpen] = React.useState(defaultOpen);
+
+  // Load persisted state on mount (client only)
+  React.useEffect(() => {
+    try {
+      const persisted = typeof window !== 'undefined' ? window.localStorage.getItem(storageKey) : null;
+      if (persisted != null) {
+        setOpen(persisted === 'true');
+      } else {
+        setOpen(defaultOpen);
+      }
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const openState = openProp ?? open;
   const setOpenState = React.useCallback(
     (open: boolean) => {
       setOpen(open);
       onOpenChange?.(open);
+      try {
+        if (typeof window !== 'undefined') {
+          window.localStorage.setItem(storageKey, String(open));
+        }
+      } catch {}
     },
-    [onOpenChange]
+    [onOpenChange, storageKey]
   );
 
   return (
@@ -99,7 +118,7 @@ const Sidebar = React.forwardRef<
         <div
           className={cn(
             // Fixed overlay panel on mobile; sticky panel on desktop
-            "group/sidebar flex h-screen w-64 flex-col bg-card border-r border-border transition-transform duration-300 overflow-y-auto fixed inset-y-0 left-0 z-40 -translate-x-full lg:sticky lg:top-0 lg:translate-x-0",
+            "group/sidebar flex h-screen w-64 flex-col bg-card border-r border-border transition-transform duration-300 overflow-y-auto fixed inset-y-0 left-0 z-50 -translate-x-full lg:sticky lg:top-0 lg:translate-x-0",
             open && "translate-x-0",
           )}
         >
@@ -122,7 +141,8 @@ const SidebarOverlay = React.forwardRef<
       ref={ref}
       onClick={() => setOpen(false)}
       className={cn(
-        "fixed inset-0 z-30 bg-black/40 lg:hidden",
+        // Start the overlay to the right of the sidebar (16rem) so it doesn't cover the sidebar itself
+        "fixed inset-y-0 right-0 left-64 z-40 bg-black/40 lg:hidden",
         className
       )}
       {...props}
@@ -312,7 +332,7 @@ const SidebarMenu = React.forwardRef<
   return (
     <ul
       ref={ref}
-      className={cn("flex w-full min-w-0 flex-col gap-1", className)}
+      className={cn("flex w-full min-w-0 flex-col gap-2", className)}
       {...props}
     />
   );
@@ -334,7 +354,7 @@ const SidebarMenuItem = React.forwardRef<
 SidebarMenuItem.displayName = "SidebarMenuItem";
 
 const sidebarMenuButtonVariants = cva(
-  "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-none ring-sidebar-ring transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-hover/sidebar:bg-sidebar-accent group-hover/sidebar:text-sidebar-accent-foreground [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
+  "peer/menu-button flex w-full items-center gap-3 overflow-hidden rounded-md px-3 py-3 text-left text-base outline-none ring-sidebar-ring transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-hover/sidebar:bg-sidebar-accent group-hover/sidebar:text-sidebar-accent-foreground [&>span:last-child]:truncate [&>svg]:size-5 [&>svg]:shrink-0",
   {
     variants: {
       variant: {
@@ -343,9 +363,9 @@ const sidebarMenuButtonVariants = cva(
           "bg-background shadow-[0_0_0_1px_hsl(var(--sidebar-border))] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-[0_0_0_1px_hsl(var(--sidebar-accent))]",
       },
       size: {
-        default: "h-8 text-sm",
-        sm: "h-7 text-xs",
-        lg: "h-12 text-sm group-hover/sidebar:w-12",
+        default: "h-11 text-base",
+        sm: "h-10 text-sm",
+        lg: "h-12 text-base group-hover/sidebar:w-12",
       },
     },
     defaultVariants: {

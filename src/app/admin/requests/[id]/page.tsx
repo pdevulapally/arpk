@@ -58,19 +58,19 @@ export default function AdminRequestDetailPage() {
   };
 
   return (
-    <main className="max-w-5xl mx-auto px-4 py-8">
-      <div className="mb-6 flex items-center justify-between">
+    <main className="max-w-5xl mx-auto px-4 py-6 sm:py-8">
+      <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <Link href="/admin/requests" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
             <ArrowLeft className="h-4 w-4"/> Back
           </Link>
-          <h1 className="font-heading text-2xl font-bold">Request Details</h1>
+          <h1 className="font-heading text-2xl sm:text-3xl font-bold">Request Details</h1>
         </div>
-        <div className="flex items-center gap-2">
-          <button onClick={() => saveStatus('accepted')} disabled={saving} className="inline-flex items-center gap-2 rounded-lg bg-green-600 text-white px-3 py-2 disabled:opacity-50">
+        <div className="grid grid-cols-2 sm:auto-cols-max sm:grid-flow-col gap-2 w-full sm:w-auto">
+          <button onClick={() => saveStatus('accepted')} disabled={saving} className="inline-flex justify-center items-center gap-2 rounded-lg bg-green-600 text-white px-3 h-10 disabled:opacity-50">
             <CheckCircle2 className="h-4 w-4"/> Accept
           </button>
-          <button onClick={() => saveStatus('rejected')} disabled={saving} className="inline-flex items-center gap-2 rounded-lg bg-red-600 text-white px-3 py-2 disabled:opacity-50">
+          <button onClick={() => saveStatus('rejected')} disabled={saving} className="inline-flex justify-center items-center gap-2 rounded-lg bg-red-600 text-white px-3 h-10 disabled:opacity-50">
             <CircleX className="h-4 w-4"/> Reject
           </button>
         </div>
@@ -82,7 +82,7 @@ export default function AdminRequestDetailPage() {
             <FileText className="h-4 w-4 text-primary"/>
             <h2 className="font-semibold">Overview</h2>
           </div>
-          <div className="grid sm:grid-cols-2 gap-4 text-sm">
+          <div className="grid gap-4 text-sm sm:grid-cols-2">
             <div>
               <p className="text-muted-foreground">Contact</p>
               <p className="text-foreground">{data?.contact?.name} — {data?.contact?.email}</p>
@@ -116,7 +116,7 @@ export default function AdminRequestDetailPage() {
               placeholder="Enter quote amount (£)"
               className="w-full sm:w-64 rounded-lg border border-border bg-background px-3 py-2"
             />
-            <button onClick={saveQuote} disabled={saving || !quote} className="inline-flex items-center gap-2 rounded-lg bg-primary text-primary-foreground px-4 py-2 disabled:opacity-50">
+            <button onClick={saveQuote} disabled={saving || !quote} className="inline-flex items-center gap-2 rounded-lg bg-primary text-primary-foreground px-4 h-10 py-2 disabled:opacity-50 w-full sm:w-auto justify-center">
               Save Quote
             </button>
           </div>
@@ -125,7 +125,7 @@ export default function AdminRequestDetailPage() {
 
         <div className="rounded-xl border border-border p-6 bg-card">
           <h2 className="font-semibold mb-3">Requested Items</h2>
-          <div className="grid sm:grid-cols-2 gap-3 text-sm">
+          <div className="grid gap-3 text-sm sm:grid-cols-2">
             <div>
               <p className="text-muted-foreground">Goals</p>
               <ul className="list-disc ml-5 mt-1">
