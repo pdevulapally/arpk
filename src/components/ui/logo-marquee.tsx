@@ -138,7 +138,16 @@ export function BlurredInfiniteSlider({
 
   return (
     <div className={cn("relative w-full", containerClassName)} style={maskStyle}>
-      <InfiniteSlider {...sliderProps}>{children}</InfiniteSlider>
+      <InfiniteSlider
+        gap={sliderProps.gap ?? 96}
+        speed={sliderProps.speed ?? 60}
+        speedOnHover={sliderProps.speedOnHover}
+        direction={sliderProps.direction}
+        reverse={sliderProps.reverse}
+        className={cn("[--gap:48px] sm:[--gap:96px]", sliderProps.className)}
+      >
+        {children}
+      </InfiniteSlider>
     </div>
   );
 }
@@ -154,17 +163,17 @@ const LOGOS = [
 
 export function LogoMarquee() {
   return (
-    <section className="bg-background/50 overflow-hidden py-16 sm:py-20">
+    <section className="bg-background/50 overflow-hidden py-12 sm:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <div className="flex flex-col items-center md:flex-row">
+        <div className="flex flex-col items-center md:flex-row gap-4">
           <div className="flex-shrink-0 text-center md:text-right md:max-w-44 md:border-r md:border-border md:pr-6">
             <p className="text-sm text-muted-foreground">Trusted tooling</p>
           </div>
-          <div className="w-full py-6 md:w-auto md:flex-1">
-            <BlurredInfiniteSlider speedOnHover={20} speed={40} gap={96} fadeWidth={80}>
+          <div className="w-full py-4 sm:py-6 md:w-auto md:flex-1">
+            <BlurredInfiniteSlider speedOnHover={20} speed={50} gap={96} fadeWidth={48}>
               {LOGOS.map((logo) => (
                 <div key={logo.src} className="flex">
-                  <img className={cn("mx-auto h-8 w-32 object-contain", (logo as any).className)} src={logo.src} alt={logo.alt} />
+                  <img className={cn("mx-auto h-6 w-24 sm:h-8 sm:w-32 object-contain", (logo as any).className)} src={logo.src} alt={logo.alt} />
                 </div>
               ))}
             </BlurredInfiniteSlider>

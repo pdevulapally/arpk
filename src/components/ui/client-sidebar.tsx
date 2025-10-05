@@ -13,11 +13,13 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 
 export function ClientSidebar() {
   const pathname = usePathname();
+  const { setOpen } = useSidebar();
   const items = [
     { href: "/dashboard", label: "Overview", icon: Home },
     { href: "/dashboard/requests", label: "Requests", icon: FileText },
@@ -38,7 +40,7 @@ export function ClientSidebar() {
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.href}>
-                  <Link href={item.href}>
+                  <Link href={item.href} onClick={() => { if (typeof window !== 'undefined' && window.innerWidth < 1024) setOpen(false); }}>
                     <SidebarMenuButton asChild isActive={pathname === item.href}>
                       <span className="flex items-center gap-2">
                         <item.icon className="h-4 w-4" />

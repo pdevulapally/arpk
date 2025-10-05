@@ -5,7 +5,7 @@ import { useUserRole } from '@/hooks/useUserRole';
 import { auth, db } from '@/lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { collection, getDocs, query, where, orderBy } from 'firebase/firestore';
-import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
+import { SidebarProvider, SidebarInset, SidebarTrigger, SidebarOverlay } from '@/components/ui/sidebar';
 import { ClientSidebar } from '@/components/ui/client-sidebar';
 
 export default function ClientDashboard() {
@@ -65,15 +65,16 @@ export default function ClientDashboard() {
     <div className="h-screen flex overflow-hidden">
       <SidebarProvider defaultOpen={false}>
         <ClientSidebar />
+        <SidebarOverlay />
         <SidebarInset className="relative z-10 flex-1 min-w-0 w-full overflow-y-auto">
-          <div className="flex items-start justify-between px-4 py-4 md:px-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between px-4 py-4 md:px-6">
             <div>
               <h1 className="font-heading text-2xl md:text-3xl">Welcome</h1>
               <p className="text-muted-foreground">Your projects, requests, and invoices at a glance.</p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex w-full sm:w-auto items-center gap-2">
               <span className="lg:hidden"><SidebarTrigger /></span>
-              <Link href="/request" className="rounded-2xl px-4 py-2 bg-primary text-primary-foreground">New request</Link>
+              <Link href="/request" className="inline-flex items-center justify-center w-full sm:w-auto h-11 px-5 rounded-xl bg-primary text-primary-foreground text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-0 active:scale-[.99]">New request</Link>
             </div>
           </div>
 

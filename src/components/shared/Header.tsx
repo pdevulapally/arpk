@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { LayoutDashboard, FileText, FolderKanban, Receipt, Settings as Cog, Users, LogOut, User as UserIcon, Home as HomeIcon } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { auth, db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
@@ -12,6 +13,8 @@ export function Header() {
   const [userRole, setUserRole] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
+  const hoverOpenTimer = useRef<number | null>(null);
+  const hoverCloseTimer = useRef<number | null>(null);
 
   useEffect(() => {
     const isDark = localStorage.getItem('theme') === 'dark' || 
@@ -128,8 +131,29 @@ export function Header() {
               <Link href="/login" className="rounded-2xl px-6 py-3 border border-border hover:bg-accent transition-colors">Login</Link>
             </>
           ) : (
-            <div className="relative" ref={menuRef}>
-              <button onClick={() => setMenuOpen(v => !v)} className="flex items-center gap-2 rounded-full border border-border bg-card px-2 py-1 hover:bg-accent">
+            <div
+              className="relative z-50"
+              ref={menuRef}
+              onMouseEnter={() => {
+                if (typeof window !== 'undefined' && window.innerWidth >= 768) {
+                  if (hoverCloseTimer.current) { window.clearTimeout(hoverCloseTimer.current); hoverCloseTimer.current = null; }
+                  hoverOpenTimer.current = window.setTimeout(() => setMenuOpen(true), 120);
+                }
+              }}
+              onMouseLeave={() => {
+                if (typeof window !== 'undefined' && window.innerWidth >= 768) {
+                  if (hoverOpenTimer.current) { window.clearTimeout(hoverOpenTimer.current); hoverOpenTimer.current = null; }
+                  hoverCloseTimer.current = window.setTimeout(() => setMenuOpen(false), 180);
+                }
+              }}
+            >
+              <button
+                type="button"
+                aria-haspopup="menu"
+                aria-expanded={menuOpen}
+                onClick={(e) => { e.stopPropagation(); setMenuOpen(v => !v); }}
+                className="flex items-center gap-2 rounded-full border border-border bg-card px-2 py-1 hover:bg-accent"
+              >
                 {user.photoURL ? (
                   <img src={user.photoURL} alt="Profile" className="h-8 w-8 rounded-full object-cover" />
                 ) : (
@@ -140,7 +164,7 @@ export function Header() {
                 <svg className="h-4 w-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7"/></svg>
               </button>
               {menuOpen && (
-                <div className="absolute right-0 mt-2 w-56 rounded-lg border border-border bg-card shadow-lg overflow-hidden">
+                <div className="absolute right-0 mt-2 w-56 rounded-lg border border-border bg-card shadow-lg overflow-hidden z-50" onClick={(e) => e.stopPropagation()}>
                   <div className="px-4 py-3">
                     <p className="text-sm font-medium text-foreground">{user.displayName || 'Account'}</p>
                     <p className="text-xs text-muted-foreground truncate">{user.email}</p>
@@ -155,26 +179,50 @@ export function Header() {
                     {userRole === 'admin' ? (
                       // Admin dropdown
                       <>
-                        <Link href="/admin" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>Admin dashboard</Link>
-                        <Link href="/admin/requests" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>Requests</Link>
-                        <Link href="/admin/projects" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>Projects</Link>
-                        <Link href="/admin/invoices" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>Invoices</Link>
-                        <Link href="/admin/users" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>Users</Link>
-                        <Link href="/admin/settings" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>Settings</Link>
+                        <Link href="/admin" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>
+                          <span className="inline-flex items-center gap-2"><LayoutDashboard className="h-4 w-4" /> Admin dashboard</span>
+                        </Link>
+                        <Link href="/admin/requests" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>
+                          <span className="inline-flex items-center gap-2"><FileText className="h-4 w-4" /> Requests</span>
+                        </Link>
+                        <Link href="/admin/projects" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>
+                          <span className="inline-flex items-center gap-2"><FolderKanban className="h-4 w-4" /> Projects</span>
+                        </Link>
+                        <Link href="/admin/invoices" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>
+                          <span className="inline-flex items-center gap-2"><Receipt className="h-4 w-4" /> Invoices</span>
+                        </Link>
+                        <Link href="/admin/users" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>
+                          <span className="inline-flex items-center gap-2"><Users className="h-4 w-4" /> Users</span>
+                        </Link>
+                        <Link href="/admin/settings" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>
+                          <span className="inline-flex items-center gap-2"><Cog className="h-4 w-4" /> Settings</span>
+                        </Link>
                       </>
                     ) : (
                       // Client/User dropdown
                       <>
-                        <Link href="/dashboard" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>Client dashboard</Link>
-                        <Link href="/dashboard/requests" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>My requests</Link>
-                        <Link href="/dashboard/projects" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>My projects</Link>
-                        <Link href="/dashboard/invoices" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>My invoices</Link>
-                        <Link href="/request" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>Make a request</Link>
+                        <Link href="/dashboard" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>
+                          <span className="inline-flex items-center gap-2"><LayoutDashboard className="h-4 w-4" /> Client dashboard</span>
+                        </Link>
+                        <Link href="/dashboard/requests" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>
+                          <span className="inline-flex items-center gap-2"><FileText className="h-4 w-4" /> My requests</span>
+                        </Link>
+                        <Link href="/dashboard/projects" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>
+                          <span className="inline-flex items-center gap-2"><FolderKanban className="h-4 w-4" /> My projects</span>
+                        </Link>
+                        <Link href="/dashboard/invoices" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>
+                          <span className="inline-flex items-center gap-2"><Receipt className="h-4 w-4" /> My invoices</span>
+                        </Link>
+                        <Link href="/profile" className="block px-4 py-2 text-sm hover:bg-accent" onClick={() => setMenuOpen(false)}>
+                          <span className="inline-flex items-center gap-2"><UserIcon className="h-4 w-4" /> Profile</span>
+                        </Link>
                       </>
                     )}
                   </div>
                   <div className="h-px bg-border" />
-                  <button onClick={handleSignOut} className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-accent">Sign out</button>
+                  <button onClick={handleSignOut} className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-accent">
+                    <span className="inline-flex items-center gap-2"><LogOut className="h-4 w-4" /> Sign out</span>
+                  </button>
                 </div>
               )}
             </div>
