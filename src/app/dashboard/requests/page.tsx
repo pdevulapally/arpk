@@ -42,16 +42,18 @@ export default function ClientRequestsPage() {
 
   return (
     <div className="h-screen flex overflow-hidden">
-      <SidebarProvider defaultOpen={false}>
+      <SidebarProvider defaultOpen={false} storageKey="client:sidebar">
         <ClientSidebar />
         <SidebarInset className="relative z-10 flex-1 min-w-0 w-full overflow-y-auto">
           <div className="flex items-start justify-between px-4 py-4 md:px-6">
-            <div>
-              <h1 className="font-heading text-2xl md:text-3xl">Your Requests</h1>
-              <p className="text-muted-foreground">Track all requests you have submitted.</p>
+            <div className="flex items-center gap-2">
+              <SidebarTrigger className="h-9 w-9 p-0 grid place-items-center text-muted-foreground hover:text-foreground" />
+              <div>
+                <h1 className="font-heading text-2xl md:text-3xl">Your Requests</h1>
+                <p className="text-muted-foreground">Track all requests you have submitted.</p>
+              </div>
             </div>
             <div className="flex items-center gap-2">
-              <span className="lg:hidden"><SidebarTrigger /></span>
               <Link href="/request" className="rounded-2xl px-4 py-2 bg-primary text-primary-foreground">New request</Link>
             </div>
           </div>

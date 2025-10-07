@@ -42,13 +42,15 @@ export default function ClientInvoicesPage() {
 
   return (
     <div className="h-screen flex overflow-hidden">
-      <SidebarProvider defaultOpen={false}>
+      <SidebarProvider defaultOpen={false} storageKey="client:sidebar">
         <ClientSidebar />
         <SidebarInset className="relative z-10 flex-1 min-w-0 w-full overflow-y-auto">
           <div className="px-4 md:px-8 xl:px-14 pb-10">
-            <div className="flex items-start justify-between py-6">
-              <h1 className="font-heading text-2xl md:text-3xl">Invoices</h1>
-              <span className="lg:hidden"><SidebarTrigger /></span>
+            <div className="flex items-center justify-between py-6">
+              <div className="flex items-center gap-2">
+                <SidebarTrigger className="h-9 w-9 p-0 grid place-items-center text-muted-foreground hover:text-foreground" />
+                <h1 className="font-heading text-2xl md:text-3xl">Invoices</h1>
+              </div>
             </div>
 
             <div className="grid gap-3">

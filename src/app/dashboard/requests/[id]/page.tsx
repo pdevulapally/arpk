@@ -78,7 +78,7 @@ export default function ClientRequestDetailsPage() {
 
   return (
     <div className="h-screen flex overflow-hidden">
-      <SidebarProvider defaultOpen={false}>
+      <SidebarProvider defaultOpen={false} storageKey="client:sidebar">
         <ClientSidebar />
         <SidebarInset className="relative z-10 flex-1 min-w-0 w-full overflow-y-auto">
           <div className="flex items-start justify-between px-4 py-4 md:px-6">
