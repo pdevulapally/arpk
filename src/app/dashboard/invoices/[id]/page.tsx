@@ -1,19 +1,22 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { ClientSidebar } from "@/components/ui/client-sidebar";
+import { CheckCircle2, Download } from "lucide-react";
 
 export default function InvoiceDetailPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const id = String(params?.id || "");
   const [uid, setUid] = useState<string | null>(null);
   const [busy, setBusy] = useState(true);
   const [inv, setInv] = useState<any | null>(null);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (u) => {
@@ -25,6 +28,32 @@ export default function InvoiceDetailPage() {
     });
     return () => unsub();
   }, [id]);
+
+  useEffect(() => {
+    // Check if coming from successful payment
+    if (searchParams.get('success') === 'true' || searchParams.get('paid') === '1') {
+      setShowSuccess(true);
+      // Remove query params from URL after showing success
+      if (typeof window !== 'undefined') {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('success');
+        url.searchParams.delete('paid');
+        window.history.replaceState({}, '', url.toString());
+      }
+      // Auto-scroll to download button after a short delay
+      setTimeout(() => {
+        const downloadBtn = document.getElementById('download-invoice-btn');
+        if (downloadBtn) {
+          downloadBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          // Highlight the button briefly
+          downloadBtn.classList.add('ring-4', 'ring-primary', 'ring-offset-2');
+          setTimeout(() => {
+            downloadBtn.classList.remove('ring-4', 'ring-primary', 'ring-offset-2');
+          }, 2000);
+        }
+      }, 500);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const load = async () => {
@@ -207,6 +236,35 @@ export default function InvoiceDetailPage() {
               <span className="lg:hidden"><SidebarTrigger /></span>
             </div>
 
+            {/* Success Message */}
+            {showSuccess && (
+              <div className="mb-6 rounded-xl border-2 border-green-500/50 bg-green-500/10 p-4 sm:p-6">
+                <div className="flex items-start gap-3 sm:gap-4">
+                  <div className="flex-shrink-0">
+                    <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-green-500 flex items-center justify-center">
+                      <CheckCircle2 className="h-6 w-6 sm:h-7 sm:w-7 text-white" />
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg sm:text-xl font-semibold text-green-700 dark:text-green-400 mb-1">
+                      Payment Successful!
+                    </h3>
+                    <p className="text-sm sm:text-base text-green-600 dark:text-green-300 mb-4">
+                      Your payment has been processed successfully. You can now download your receipt below.
+                    </p>
+                    <button
+                      id="download-invoice-btn"
+                      onClick={download}
+                      className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-primary to-purple-600 px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium text-white shadow-lg hover:shadow-xl transition-all hover:scale-105"
+                    >
+                      <Download className="h-4 w-4 sm:h-5 sm:w-5" />
+                      Download Receipt
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="rounded-xl border border-border bg-card p-6">
               <div className="grid sm:grid-cols-2 gap-4 text-sm">
                 <div>
@@ -218,8 +276,13 @@ export default function InvoiceDetailPage() {
                   <div className="font-medium capitalize">{inv.status || 'paid'}</div>
                 </div>
                 <div className="sm:col-span-2">
-                  <button onClick={download} className="mt-2 rounded-lg bg-gradient-to-r from-primary to-purple-600 px-4 py-2 text-sm text-white shadow hover:opacity-95">
-                    Download Invoice
+                  <button 
+                    id={showSuccess ? undefined : "download-invoice-btn"}
+                    onClick={download} 
+                    className="mt-2 inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-primary to-purple-600 px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium text-white shadow-lg hover:shadow-xl transition-all hover:scale-105"
+                  >
+                    <Download className="h-4 w-4 sm:h-5 sm:w-5" />
+                    Download Receipt / Invoice
                   </button>
                 </div>
               </div>

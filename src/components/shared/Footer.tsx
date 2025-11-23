@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 
 export function Footer() {
@@ -24,14 +25,18 @@ export function Footer() {
         <div className="grid md:grid-cols-4 gap-8">
           <div className="md:col-span-2">
             <div className="mb-4">
-              <img 
-                src="/Images/ARPK-official-black-logo.png" 
-                alt="ARPK" 
+              <Image
+                src="/Images/ARPK-official-black-logo.png"
+                alt="ARPK Logo"
+                width={128}
+                height={64}
                 className={`h-12 sm:h-16 w-auto ${darkMode ? 'hidden' : 'block'}`}
               />
-              <img 
-                src="/Images/ARPK-Official-white-Logo.png" 
-                alt="ARPK" 
+              <Image
+                src="/Images/ARPK-Official-white-Logo.png"
+                alt="ARPK Logo"
+                width={128}
+                height={64}
                 className={`h-12 sm:h-16 w-auto ${darkMode ? 'block' : 'hidden'}`}
               />
             </div>
@@ -50,6 +55,11 @@ export function Footer() {
             <ul className="space-y-2 text-muted-foreground">
               <li><Link href="/services" className="hover:text-foreground transition-colors">Web Development</Link></li>
               <li><Link href="/services" className="hover:text-foreground transition-colors">Software Development</Link></li>
+              <li><Link href="/services" className="hover:text-foreground transition-colors">AI Integration</Link></li>
+              <li><Link href="/services" className="hover:text-foreground transition-colors">Automation</Link></li>
+              <li><Link href="/services" className="hover:text-foreground transition-colors">Chatbots</Link></li>
+              <li><Link href="/services" className="hover:text-foreground transition-colors">Payment Integration</Link></li>
+              <li><Link href="/services" className="hover:text-foreground transition-colors">E-commerce</Link></li>
               <li><Link href="/services" className="hover:text-foreground transition-colors">Consulting</Link></li>
               <li><Link href="/services" className="hover:text-foreground transition-colors">Maintenance</Link></li>
             </ul>

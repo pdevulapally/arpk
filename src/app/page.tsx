@@ -2,12 +2,21 @@
 import { motion } from "framer-motion";
 import { ArrowRight, ChevronRight, Rocket, Brush, Wrench, ClipboardList } from "lucide-react";
 import Link from "next/link";
-import { FeaturesSectionWithCardGradient } from "@/components/ui/feature-section-with-card-gradient";
-import { Feature } from "@/components/ui/feature-section-with-grid";
-import { LogoMarquee } from "@/components/ui/logo-marquee";
-import DotCard from "@/components/ui/dot-card";
+import Image from "next/image";
+import dynamic from "next/dynamic";
 import { Header } from "@/components/shared/Header";
 import { Footer } from "@/components/shared/Footer";
+
+// Lazy load heavy components
+const FeaturesSectionWithCardGradient = dynamic(() => import("@/components/ui/feature-section-with-card-gradient").then(mod => ({ default: mod.FeaturesSectionWithCardGradient })), {
+  loading: () => <div className="h-64 animate-pulse bg-muted rounded-lg" />,
+});
+const Feature = dynamic(() => import("@/components/ui/feature-section-with-grid").then(mod => ({ default: mod.Feature })), {
+  loading: () => <div className="h-64 animate-pulse bg-muted rounded-lg" />,
+});
+const LogoMarquee = dynamic(() => import("@/components/ui/logo-marquee").then(mod => ({ default: mod.LogoMarquee })), {
+  loading: () => <div className="h-20 animate-pulse bg-muted rounded" />,
+});
 
 export default function Home() {
   return (
@@ -60,7 +69,7 @@ export default function Home() {
               transition={{ duration: 0.5, delay: 0.15 }}
               className="text-muted-foreground mx-auto mt-4 sm:mt-6 max-w-2xl text-center text-base sm:text-lg"
             >
-              ARPK crafts premium websites and software with transparent processes, clear milestones,
+              ARPK crafts premium websites, software, AI integrations, automation systems, chatbots, and payment solutions with transparent processes, clear milestones,
               and outcomes that move your business forward.
             </motion.p>
 
@@ -73,18 +82,20 @@ export default function Home() {
             >
               <Link
                 href="/request"
-                className="group bg-primary text-primary-foreground hover:shadow-primary/30 relative overflow-hidden rounded-full px-6 py-3 text-base sm:text-lg shadow-lg transition-all duration-300 w-full sm:w-auto inline-flex items-center justify-center text-center"
+                className="group bg-primary text-primary-foreground hover:shadow-primary/30 relative overflow-hidden rounded-full px-6 py-3 text-base sm:text-lg shadow-lg transition-all duration-300 w-full sm:w-auto inline-flex items-center justify-center text-center focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                aria-label="Start your project with ARPK"
               >
                 <span className="relative z-10 flex items-center justify-center gap-2">
                   Start your project
-                  <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                  <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true" />
                 </span>
-                <span className="from-primary via-primary/90 to-primary/80 absolute inset-0 z-0 bg-gradient-to-r opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
+                <span className="from-primary via-primary/90 to-primary/80 absolute inset-0 z-0 bg-gradient-to-r opacity-0 transition-opacity duration-300 group-hover:opacity-100" aria-hidden="true"></span>
               </Link>
 
               <Link
                 href="/contact"
-                className="border-border bg-background/50 inline-flex items-center gap-2 rounded-full border px-6 py-3 text-base sm:text-lg backdrop-blur-sm hover:bg-accent/30 w-full sm:w-auto justify-center text-center"
+                className="border-border bg-background/50 inline-flex items-center gap-2 rounded-full border px-6 py-3 text-base sm:text-lg backdrop-blur-sm hover:bg-accent/30 w-full sm:w-auto justify-center text-center focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border"
+                aria-label="Contact ARPK Studio"
               >
                 Talk to us
               </Link>
@@ -100,17 +111,17 @@ export default function Home() {
 
 
       {/* Services Section - Grid Feature */}
-      <section className="px-4 sm:px-6 py-16 sm:py-20">
+      <section className="px-4 sm:px-6 py-16 sm:py-20" aria-labelledby="services-heading">
         <div className="max-w-6xl mx-auto">
           <Feature />
         </div>
       </section>
 
       {/* Why Choose ARPK Section */}
-      <section className="px-4 sm:px-6 py-16 sm:py-20">
+      <section className="px-4 sm:px-6 py-16 sm:py-20" aria-labelledby="why-choose-heading">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8 sm:mb-12">
-            <h2 className="font-heading text-3xl sm:text-4xl mb-4">Why Choose ARPK?</h2>
+            <h2 id="why-choose-heading" className="font-heading text-3xl sm:text-4xl mb-4">Why Choose ARPK?</h2>
             <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
               We combine technical expertise with clear communication to deliver exceptional results.
             </p>
@@ -120,10 +131,10 @@ export default function Home() {
       </section>
 
       {/* Process Section */}
-      <section className="px-4 sm:px-6 py-16 sm:py-20">
+      <section className="px-4 sm:px-6 py-16 sm:py-20" aria-labelledby="process-heading">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12 sm:mb-16">
-            <h2 className="font-heading text-3xl sm:text-4xl mb-4">Our Process</h2>
+            <h2 id="process-heading" className="font-heading text-3xl sm:text-4xl mb-4">Our Process</h2>
             <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
               Clear milestones, transparent communication, predictable outcomes.
             </p>
@@ -177,17 +188,17 @@ export default function Home() {
       </section>
 
       {/* CTA Section - Premium card */}
-      <section className="relative px-4 sm:px-6 py-16 sm:py-20">
-        <div className="absolute inset-0 -z-10 overflow-hidden">
+      <section className="relative px-4 sm:px-6 py-16 sm:py-20" aria-labelledby="cta-heading">
+        <div className="absolute inset-0 -z-10 overflow-hidden" aria-hidden="true">
           <div className="pointer-events-none absolute left-1/2 top-1/2 h-[700px] w-[700px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/10 blur-3xl" />
         </div>
         <div className="mx-auto max-w-7xl">
           <div className="relative rounded-3xl p-[1px] bg-gradient-to-br from-primary/40 via-border to-transparent">
             <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-card/80 backdrop-blur supports-[backdrop-filter]:bg-card/60">
-              <div className="absolute inset-0 bg-[linear-gradient(to_right,#8881_1px,transparent_1px),linear-gradient(to_bottom,#8881_1px,transparent_1px)] bg-[size:20px_20px] opacity-[0.08]" />
+              <div className="absolute inset-0 bg-[linear-gradient(to_right,#8881_1px,transparent_1px),linear-gradient(to_bottom,#8881_1px,transparent_1px)] bg-[size:20px_20px] opacity-[0.08]" aria-hidden="true" />
               <div className="relative z-10 px-6 sm:px-10 py-10 sm:py-14 text-center">
-                <h2 className="font-heading tracking-tight text-3xl sm:text-4xl md:text-5xl bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
-                  Let’s build something exceptional
+                <h2 id="cta-heading" className="font-heading tracking-tight text-3xl sm:text-4xl md:text-5xl bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
+                  Let's build something exceptional
                 </h2>
                 <p className="mt-4 sm:mt-5 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
                   Tell us your goals. We’ll turn them into a clear plan, a transparent timeline, and premium execution.
@@ -195,14 +206,16 @@ export default function Home() {
                 <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4">
                   <Link
                     href="/request"
-                    className="group relative inline-flex items-center justify-center rounded-full px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-medium text-primary-foreground shadow-lg transition-all bg-primary hover:shadow-primary/30"
+                    className="group relative inline-flex items-center justify-center rounded-full px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-medium text-primary-foreground shadow-lg transition-all bg-primary hover:shadow-primary/30 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                    aria-label="Start your project with ARPK"
                   >
                     <span className="relative z-10">Start your project</span>
-                    <span className="absolute inset-0 rounded-full from-primary/80 via-primary/70 to-primary/60 bg-gradient-to-r opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                    <span className="absolute inset-0 rounded-full from-primary/80 via-primary/70 to-primary/60 bg-gradient-to-r opacity-0 transition-opacity duration-300 group-hover:opacity-100" aria-hidden="true" />
             </Link>
                   <Link
                     href="/contact"
-                    className="relative inline-flex items-center justify-center rounded-full px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-medium border border-border bg-background/60 hover:bg-accent/30 backdrop-blur"
+                    className="relative inline-flex items-center justify-center rounded-full px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-medium border border-border bg-background/60 hover:bg-accent/30 backdrop-blur focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border"
+                    aria-label="Contact ARPK Studio"
                   >
                     Talk to us
             </Link>

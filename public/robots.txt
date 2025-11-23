@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+# Add your sitemap URL here: Sitemap: https://arpk.vercel.app/sitemap.xml
+
+# Disallow admin and dashboard routes
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /api/
+

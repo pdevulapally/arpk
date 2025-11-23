@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { LayoutDashboard, FileText, FolderKanban, Receipt, Settings as Cog, Users, LogOut, User as UserIcon, Home as HomeIcon } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { auth, db } from "@/lib/firebase";
@@ -91,15 +92,21 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
       <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-        <Link href="/" className="flex items-center">
-          <img 
-            src="/Images/ARPK-official-black-logo.png" 
-            alt="ARPK" 
+        <Link href="/" className="flex items-center" aria-label="ARPK Home">
+          <Image
+            src="/Images/ARPK-official-black-logo.png"
+            alt="ARPK Logo"
+            width={128}
+            height={64}
+            priority
             className={`h-12 sm:h-16 w-auto ${darkMode ? 'hidden' : 'block'}`}
           />
-          <img 
-            src="/Images/ARPK-Official-white-Logo.png" 
-            alt="ARPK" 
+          <Image
+            src="/Images/ARPK-Official-white-Logo.png"
+            alt="ARPK Logo"
+            width={128}
+            height={64}
+            priority
             className={`h-12 sm:h-16 w-auto ${darkMode ? 'block' : 'hidden'}`}
           />
         </Link>
@@ -155,9 +162,9 @@ export function Header() {
                 className="flex items-center gap-2 rounded-full border border-border bg-card px-2 py-1 hover:bg-accent"
               >
                 {user.photoURL ? (
-                  <img src={user.photoURL} alt="Profile" className="h-8 w-8 rounded-full object-cover" />
+                  <Image src={user.photoURL} alt="Profile" width={32} height={32} className="h-8 w-8 rounded-full object-cover" />
                 ) : (
-                  <div className={`h-8 w-8 rounded-full grid place-items-center text-sm font-medium text-foreground bg-gradient-to-br ${gradientFor(user.displayName || user.email || 'U')}`}>
+                  <div className={`h-8 w-8 rounded-full grid place-items-center text-sm font-medium text-foreground bg-gradient-to-br ${gradientFor(user.displayName || user.email || 'U')}`} aria-label={user.displayName || user.email || "User"}>
                     {avatarText(user.displayName || user.email)}
                   </div>
                 )}
@@ -248,9 +255,9 @@ export function Header() {
             <div className="relative" ref={menuRef}>
               <button onClick={() => setMenuOpen(v => !v)} className="flex items-center gap-2 rounded-full border border-border bg-card px-2 py-1 hover:bg-accent">
                 {user.photoURL ? (
-                  <img src={user.photoURL} alt="Profile" className="h-8 w-8 rounded-full object-cover" />
+                  <Image src={user.photoURL} alt="Profile" width={32} height={32} className="h-8 w-8 rounded-full object-cover" />
                 ) : (
-                  <div className={`h-8 w-8 rounded-full grid place-items-center text-sm font-medium text-foreground bg-gradient-to-br ${gradientFor(user.displayName || user.email || 'U')}`}>
+                  <div className={`h-8 w-8 rounded-full grid place-items-center text-sm font-medium text-foreground bg-gradient-to-br ${gradientFor(user.displayName || user.email || 'U')}`} aria-label={user.displayName || user.email || "User"}>
                     {avatarText(user.displayName || user.email)}
                   </div>
                 )}

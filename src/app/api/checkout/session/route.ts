@@ -35,8 +35,16 @@ export async function POST(req: Request) {
           quantity: 1,
         },
       ],
-      success_url: successUrl || `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/dashboard/projects/${projectId}?paid=1`,
-      cancel_url: cancelUrl || `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/dashboard/projects/${projectId}?canceled=1`,
+      success_url: successUrl || (invoiceId 
+        ? (process.env.NEXT_PUBLIC_BASE_URL 
+          ? `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard/invoices/${invoiceId}?paid=1&success=true`
+          : `/dashboard/invoices/${invoiceId}?paid=1&success=true`)
+        : (process.env.NEXT_PUBLIC_BASE_URL 
+          ? `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard/projects/${projectId}?paid=1`
+          : `/dashboard/projects/${projectId}?paid=1`)),
+      cancel_url: cancelUrl || (process.env.NEXT_PUBLIC_BASE_URL
+        ? `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard/projects/${projectId}?canceled=1`
+        : `/dashboard/projects/${projectId}?canceled=1`),
       metadata: { projectId, invoiceId: invoiceId || '' },
     });
 

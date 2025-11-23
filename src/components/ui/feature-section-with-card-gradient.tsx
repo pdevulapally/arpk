@@ -1,16 +1,15 @@
 import React from "react";
-import { useId } from "react";
 
 export function FeaturesSectionWithCardGradient() {
   return (
     <div className="py-0">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
-        {grid.map((feature) => (
+        {grid.map((feature, index) => (
           <div
             key={feature.title}
             className="relative bg-gradient-to-b dark:from-card from-card dark:to-muted to-muted p-6 rounded-3xl overflow-hidden border border-border"
           >
-            <Grid size={20} />
+            <Grid size={20} id={`grid-${index}`} />
             <p className="text-base font-bold text-foreground relative z-20">
               {feature.title}
             </p>
@@ -70,9 +69,11 @@ const grid = [
 export const Grid = ({
   pattern,
   size,
+  id,
 }: {
   pattern?: number[][];
   size?: number;
+  id?: string;
 }) => {
   // Deterministic default pattern for SSR/CSR hydration stability
   const p = pattern ?? [
@@ -91,6 +92,7 @@ export const Grid = ({
           x="-12"
           y="4"
           squares={p}
+          id={id}
           className="absolute inset-0 h-full w-full  mix-blend-overlay dark:fill-primary/10 dark:stroke-primary/10 stroke-primary/10 fill-primary/5"
         />
       </div>
@@ -98,8 +100,10 @@ export const Grid = ({
   );
 };
 
-export function GridPattern({ width, height, x, y, squares, ...props }: any) {
-  const patternId = useId();
+export function GridPattern({ width, height, x, y, squares, id, ...props }: any) {
+  // Use provided ID or generate a deterministic one based on props
+  // This ensures consistent IDs between server and client
+  const patternId = id || `grid-pattern-${width}-${height}-${x}-${y}`;
 
   return (
     <svg aria-hidden="true" {...props}>
