@@ -12,6 +12,7 @@ export default function ContactPage() {
     const payload = {
       name: form.name.value,
       email: form.email.value,
+      phone: form.phone.value,
       subject: form.subject.value || undefined,
       message: form.message.value,
     };
@@ -50,11 +51,12 @@ export default function ContactPage() {
                     <input name="name" placeholder="Your name" required className="bg-background border border-border rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground" />
                     <input name="email" placeholder="Email" type="email" required className="bg-background border border-border rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground" />
                   </div>
+                  <input name="phone" placeholder="Phone number" type="tel" required className="bg-background border border-border rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground" />
                   <input name="subject" placeholder="Subject (optional)" className="bg-background border border-border rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground" />
                   <textarea name="message" placeholder="Tell us a bit about your project or question" required rows={6} className="bg-background border border-border rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground" />
-                  <div className="flex items-center justify-between">
-                    <p className="text-xs text-muted-foreground">By submitting, you agree to be contacted about your project.</p>
-                    <button disabled={loading} className="rounded-full px-6 py-3 bg-primary text-primary-foreground disabled:opacity-60">
+                  <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 md:gap-4">
+                    <p className="text-xs text-muted-foreground flex-shrink-0">By submitting, you agree to be contacted about your project.</p>
+                    <button disabled={loading} className="rounded-full px-6 py-3 bg-primary text-primary-foreground disabled:opacity-60 w-full md:w-auto whitespace-nowrap flex-shrink-0">
                       {loading ? 'Sending…' : 'Send message'}
                     </button>
                   </div>
